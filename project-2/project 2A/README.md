@@ -1,0 +1,18 @@
+In the first part of Project 2, you will be implementing the bulk load command, similar to the LOAD DATA command you used in MySQL for Project 1B. For Bruinbase, the syntax to load data into a table is:
+
+LOAD tablename FROM 'filename' [ WITH INDEX ]
+This command creates a table named tablename and loads the (key, value) pairs from the file filename. If the option WITH INDEX is specified, Bruinbase also creates the index on the key column of the table. The format for the input file must be a single key and value pair per line, separated by a comma. The key must be an integer, and the value (a string) should be enclosed in double quotes, such as:
+
+1,"value 1"
+2,"value 2"
+...
+
+Note that when the user issues a LOAD command, Bruinbase invokes the SqlEngine::load(table, loadfile, index) function with the user-provided table name and the load file name as its parameters. The third parameter is set to true if WITH INDEX option is specified. For example, if the user issues the command "LOAD movie FROM 'movieData.del'", the first parameter table will be "movie", the second parameter loadfile will be "movieData.del", and the third parameter index will be false. Implement the SqlEngine::load() function to load tuples into the table from the load file. Since you have not implemented any indexes yet, you do not need to worry about the index creation part yet. For now, assume that the third parameter index will be always false and implement the load function.
+
+For reading the loadfile, you may use any standard C/C++ file I/O functions, like fstream, fgets, etc. For table storage, however, you must use the provided RecordFile class. The created Recordfile should be named as tablename + ".tbl". For example, when the user issues the command "LOAD movie FROM 'movieData.del'", you should create a RecordFile named movie.tbl (in the current working directory) and store all tuples in the file. If the file already exists, the LOAD command should append all records in the load file to the end of the table. Roughly, your implementation of the load function should open the input loadfile and the RecordFile, parse each line of the loadfile to read a tuple (possibly using SqlEngine::parseLoadLine()) and insert the tuple to the RecordFile. Note that for this part of the project, you can modify only the load() function of SqlEngine, not any other parts of the Bruinbase code.
+
+In bruinbase.zip, we have provided a sample data file movie.del, as well as a RecordFile movie.tbl loaded from the sample data file. As you will be using the RecordFile class for table storage, the table file created by your code from movie.del should be roughly the same as the one provided. You can verify if your load command is successful by comparing some query results between the two tables.
+
+Remember that, as you modify your code, you'll need to run make and rerun Bruinbase to witness any changes you've made. As you implement the SqlEngine::load function, you may find it helpful to use debugging tools such as GDB.
+
+The primary goal of Part A is to make sure that you (1) understand the Bruinbase code thoroughly and (2) feel comfortable with modifying the code as needed. Since our focus is not string parsing, you do not have to worry about possible variations in the input load file. During the testing of your code, we will use only "well-formed" load files that follow the spec, so as long as your code can correctly parse and load well-formed load files, you won't lose any points for this part of the project. The provided SqlEngine::parseLoadLine() is likely to be sufficient for your parsing need of the input load file.
